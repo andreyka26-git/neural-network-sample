@@ -5,8 +5,8 @@ namespace NeuralNetworkLib
 {
     public class NeuronLayer
     {
-        public List<Neuron> Neurons { get; set; }
-
+        public List<Neuron> Neurons { get; set;  }
+        
         public void ConnectToInputLayer(NeuronLayer inputNeuronLayer)
         {
             var random = new Random();

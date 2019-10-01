@@ -6,7 +6,11 @@ namespace NeuralNetworkLib
     {
         public static float Activation(float input)
         {
-            return 1.0f / (1.0f + (float)Math.Exp(-input));
+            if (input > 0)
+                return 1;
+
+            return -1;
+            //return 1.0f / (1.0f + (float)Math.Exp(-input));
         }
     }
 }

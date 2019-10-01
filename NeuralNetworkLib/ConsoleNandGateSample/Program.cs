@@ -7,6 +7,7 @@ namespace ConsoleNandGateSample
 {
     class Program
     {
+        private static float _learningRate = (float) 0.2;
         static void Main()
         {
             var net = BuildNet();
@@ -17,6 +18,8 @@ namespace ConsoleNandGateSample
                 var response = net.FeedForward(trainingData.Data);
 
                 var error = Math.Abs(response - trainingData.Target);
+
+                net.CorrectNet(trainingData.Target, error, _learningRate);
             }
         }
 
@@ -62,7 +65,11 @@ namespace ConsoleNandGateSample
                 Neurons = new List<Neuron>
                 {
                     new Neuron(),
-                    new Neuron()
+                    new Neuron(),
+                    new Neuron // bias
+                    {
+                        Value = 1
+                    }
                 }
             };
 
