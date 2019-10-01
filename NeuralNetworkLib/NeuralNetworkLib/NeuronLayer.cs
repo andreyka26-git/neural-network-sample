@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace NeuralNetworkLib
 {
@@ -8,22 +9,26 @@ namespace NeuralNetworkLib
 
         public void ConnectToInputLayer(NeuronLayer inputNeuronLayer)
         {
+            var random = new Random();
+
             foreach (var localNeuron in Neurons)
             {
                 foreach (var inputNeuron in inputNeuronLayer.Neurons)
                 {
-                    localNeuron.ConnectToInputNeuron(inputNeuron, 0);
+                    localNeuron.ConnectToInputNeuron(inputNeuron, (float)random.NextDouble());
                 }
             }
         }
 
         public void ConnectToOutputLayer(NeuronLayer outputNeuronLayer)
         {
+            var random = new Random();
+
             foreach (var localNeuron in Neurons)
             {
-                foreach (var inputNeuron in outputNeuronLayer.Neurons)
+                foreach (var outputNeuron in outputNeuronLayer.Neurons)
                 {
-                    localNeuron.ConnectToInputNeuron(inputNeuron, 0);
+                    localNeuron.ConnectToOutputNeuron(outputNeuron, (float)random.NextDouble());
                 }
             }
         }
