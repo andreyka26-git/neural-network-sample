@@ -4,7 +4,11 @@ namespace NeuralNetworkLib
 {
     public class Neuron
     {
+        //Value which calculated during feed forwarding
         public float Value { get; set; }
+
+        //Value which calculated during calculation of error in order to perform back propagation
+        public float Error { get; set; }
 
         public List<Synapse> InputSynapses { get; set; } = new List<Synapse>();
 

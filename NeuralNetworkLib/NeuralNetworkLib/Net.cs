@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Security.Cryptography;
 
 namespace NeuralNetworkLib
 {
@@ -31,7 +33,7 @@ namespace NeuralNetworkLib
 
                     //multiply all except last because it is bias.
                     var sum = weightSynapses.Sum(s => s.StartNeuron.Value * s.Weight);
-                    neuron.Value = MathHelper.Activation(sum + biasSynapse.Weight);
+                    neuron.Value = MathHelper.Sigmoid(sum + biasSynapse.Weight);
                 }
             }
 
@@ -40,23 +42,26 @@ namespace NeuralNetworkLib
             return result.Value;
         }
 
-        public void CorrectNet(float target, float error, float learningRate)
+        public void CalculateError(float target)
         {
-            for (var layerIndex = _layers.Count - 1; layerIndex > 0; layerIndex--)
+            var responseNeuron = _layers.Last().Neurons.Single();
+            responseNeuron.Error = target - responseNeuron.Value;
+
+            var hiddenLayer = _layers[_layers.Count - 2];
+
+            foreach (var hiddenLayerNeuron in hiddenLayer.Neurons)
             {
-                foreach (var neuron in _layers[layerIndex].Neurons)
-                {
-                    var weightSynapses = neuron.InputSynapses.Take(neuron.InputSynapses.Count - 2);
+                float error = 0;
 
-                    foreach (var inputSynapse in weightSynapses)
-                    {
-                        inputSynapse.Weight = inputSynapse.Weight + (learningRate * (target - error) * inputSynapse.StartNeuron.Value);
-                    }
-
-                    var biasSynapse = neuron.InputSynapses.Skip(neuron.InputSynapses.Count - 2).Single();
-                    biasSynapse.Weight = biasSynapse.Weight + learningRate * (target - error);
-                }
+                foreach (var synapse in hiddenLayerNeuron.OutputSynapses)
+                    error += synapse.Weight * responseNeuron.Error;
             }
+
+        }
+
+        public void BackPropagate(float target, float learningRate)
+        {
+
         }
 
         public Net(List<NeuronLayer> layers)

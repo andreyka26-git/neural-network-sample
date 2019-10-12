@@ -13,13 +13,14 @@ namespace ConsoleNandGateSample
             var net = BuildNet();
             var trainingDataSet = GetTrainingData();
 
+            //suppose that we need to get response form one output
             foreach (var trainingData in trainingDataSet)
             {
                 var response = net.FeedForward(trainingData.Data);
-
-                var error = Math.Abs(response - trainingData.Target);
-
-                net.CorrectNet(trainingData.Target, error, _learningRate);
+                
+                net.CalculateError(trainingData.Target);
+                
+                net.BackPropagate(trainingData.Target, _learningRate);
             }
         }
 
@@ -73,6 +74,19 @@ namespace ConsoleNandGateSample
                 }
             };
 
+            var hiddenLayer = new NeuronLayer
+            {
+                Neurons = new List<Neuron>
+                {
+                    new Neuron(),
+                    new Neuron(),
+                    new Neuron // bias
+                    {
+                        Value = 1
+                    }
+                }
+            };
+
             var outputLayer = new NeuronLayer
             {
                 Neurons = new List<Neuron>
@@ -82,6 +96,7 @@ namespace ConsoleNandGateSample
             };
 
             layers.Add(inputLayer);
+            layers.Add(hiddenLayer);
             layers.Add(outputLayer);
 
             var network = new Net(layers);
