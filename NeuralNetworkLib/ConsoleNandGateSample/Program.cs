@@ -23,11 +23,11 @@ namespace ConsoleNandGateSample
                 {
                     var output = net.FeedForward(trainingData.Data);
 
-                    net.CalculateError(trainingData.Target);
+                    net.CalculateError(new [] { trainingData.Targets });
 
-                    errors.Add(trainingData.Target - output);
+                    errors.Add(trainingData.Targets - output.Single().Value);
 
-                    net.BackPropagate(trainingData.Target, _learningRate);
+                    net.BackPropagate(new [] { trainingData.Targets }, _learningRate);
                 }
 
                 var averageError = errors.Sum() / errors.Count;
@@ -53,16 +53,16 @@ namespace ConsoleNandGateSample
                 var inputs = new[] {firstValue, secondValue};
 
                 var response = net.FeedForward(inputs);
-                var absoluteResponse = response > 0.5 ? 1 : 0;
+                var absoluteResponse = response.Single().Value > 0.5 ? 1 : 0;
                 Console.WriteLine($"Response: {absoluteResponse}{Environment.NewLine}");
             }
         }
 
-        static List<TrainingData<float[]>> GetXorTrainingData()
+        static List<TrainingData<float[], float>> GetXorTrainingData()
         {
             var trainingDataFilePath = $"{Environment.CurrentDirectory}/Resources/XOR_training_data.txt";
 
-            var trainingDataSet = new List<TrainingData<float[]>>();
+            var trainingDataSet = new List<TrainingData<float[], float>>();
             var lines = File.ReadAllLines(trainingDataFilePath);
 
             foreach (var line in lines)
@@ -73,10 +73,10 @@ namespace ConsoleNandGateSample
                 var secondInput = float.Parse(splitLine[1]);
                 var target = float.Parse(splitLine[2]);
 
-                var trainingData = new TrainingData<float[]>
+                var trainingData = new TrainingData<float[], float>
                 {
                     Data = new[] { firstInput, secondInput },
-                    Target = target
+                    Targets = target
                 };
 
                 trainingDataSet.Add(trainingData);
@@ -85,11 +85,11 @@ namespace ConsoleNandGateSample
             return trainingDataSet;
         }
 
-        static List<TrainingData<float[]>> GetNandTrainingData()
+        static List<TrainingData<float[], float>> GetNandTrainingData()
         {
             var trainingDataFilePath = $"{Environment.CurrentDirectory}/Resources/NAND_training_data.txt";
 
-            var trainingDataSet = new List<TrainingData<float[]>>();
+            var trainingDataSet = new List<TrainingData<float[], float>>();
             var lines = File.ReadAllLines(trainingDataFilePath);
 
             foreach (var line in lines)
@@ -100,10 +100,10 @@ namespace ConsoleNandGateSample
                 var secondInput = float.Parse(splitLine[1]);
                 var target = float.Parse(splitLine[2]);
 
-                var trainingData = new TrainingData<float[]>
+                var trainingData = new TrainingData<float[], float>
                 {
                     Data = new[] { firstInput, secondInput },
-                    Target = target
+                    Targets = target
                 };
 
                 trainingDataSet.Add(trainingData);

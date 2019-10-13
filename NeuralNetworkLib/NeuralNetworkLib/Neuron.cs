@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace NeuralNetworkLib
 {
@@ -49,6 +50,32 @@ namespace NeuralNetworkLib
             var synapse = new Synapse(this, outputNeuron, weight);
             OutputSynapses.Add(synapse);
             outputNeuron.InputSynapses.Add(synapse);
+        }
+
+        /// <summary>
+        /// Gets bias connected to current neuron
+        /// </summary>
+        /// <returns>Connection</returns>
+        public Synapse GetInputBiasSynapse()
+        {
+            if (InputSynapses.Count == 0)
+                return null;
+
+            var biasSynapse = InputSynapses.Skip(InputSynapses.Count - 1).Take(1).Single();
+            return biasSynapse;
+        }
+
+        /// <summary>
+        /// Get all synapses connected to current neuron
+        /// </summary>
+        /// <returns>List of synapses</returns>
+        public List<Synapse> GetInputWeightSynapses()
+        {
+            if(InputSynapses.Count == 0)
+                return new List<Synapse>();
+
+            var synapses = InputSynapses.Take(InputSynapses.Count - 1).ToList();
+            return synapses;
         }
     }
 }
