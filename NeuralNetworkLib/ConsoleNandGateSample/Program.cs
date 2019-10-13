@@ -16,7 +16,7 @@ namespace ConsoleNandGateSample
             //suppose that we need to get response form one output
             foreach (var trainingData in trainingDataSet)
             {
-                var response = net.FeedForward(trainingData.Data);
+                net.FeedForward(trainingData.Data);
                 
                 net.CalculateError(trainingData.Target);
                 

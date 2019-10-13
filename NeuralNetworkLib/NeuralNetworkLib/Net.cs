@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Security.Cryptography;
 
 namespace NeuralNetworkLib
 {
@@ -51,17 +49,38 @@ namespace NeuralNetworkLib
 
             foreach (var hiddenLayerNeuron in hiddenLayer.Neurons)
             {
-                float error = 0;
+                hiddenLayerNeuron.Error = 0;
 
                 foreach (var synapse in hiddenLayerNeuron.OutputSynapses)
-                    error += synapse.Weight * responseNeuron.Error;
+                    hiddenLayerNeuron.Error += synapse.Weight * responseNeuron.Error;
             }
-
         }
 
         public void BackPropagate(float target, float learningRate)
         {
+            var outputNeuron = _layers.Last().Neurons.Last();
 
+            var hiddenLayerNeurons = _layers[_layers.Count - 2].Neurons;
+
+            foreach (var hiddenNeuron in hiddenLayerNeurons)
+            {
+                foreach (var inputSynapse in hiddenNeuron.OutputSynapses)
+                {
+                    var deltaWeight = hiddenNeuron.Error * MathHelper.Sigmoid(outputNeuron.Value) * (1 - MathHelper.Sigmoid(outputNeuron.Value)) * inputSynapse.StartNeuron.Value;
+                    inputSynapse.Weight += deltaWeight * learningRate;
+                }
+            }
+
+            var inputLayerNeurons = _layers[_layers.Count - 2].Neurons;
+
+            for (var neuronIndex = 0; neuronIndex < inputLayerNeurons.Count; neuronIndex++)
+            {
+                foreach (var inputSynapse in inputLayerNeurons[neuronIndex].OutputSynapses)
+                {
+                    var deltaWeight = hiddenLayerNeurons[neuronIndex].Error * MathHelper.Sigmoid(hiddenLayerNeurons[neuronIndex].Value) * (1 - MathHelper.Sigmoid(hiddenLayerNeurons[neuronIndex].Value)) * inputSynapse.StartNeuron.Value;
+                    inputSynapse.Weight += deltaWeight * learningRate;
+                }
+            }
         }
 
         public Net(List<NeuronLayer> layers)
