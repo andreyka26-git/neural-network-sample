@@ -16,7 +16,7 @@ namespace ConsoleNandGateSample
             {
                 var errors = new List<float>();
 
-                var trainingDataSet = GetNANDTrainingData();
+                var trainingDataSet = GetXORTrainingData();
 
                 //suppose that we need to get response form one output
                 foreach (var trainingData in trainingDataSet)
