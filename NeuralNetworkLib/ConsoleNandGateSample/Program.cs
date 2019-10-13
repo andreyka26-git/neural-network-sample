@@ -16,7 +16,7 @@ namespace ConsoleNandGateSample
             {
                 var errors = new List<float>();
 
-                var trainingDataSet = GetXORTrainingData();
+                var trainingDataSet = GetXorTrainingData();
 
                 //suppose that we need to get response form one output
                 foreach (var trainingData in trainingDataSet)
@@ -35,9 +35,30 @@ namespace ConsoleNandGateSample
             }
 
             Console.WriteLine("Training is ended.");
+
+            while (true)
+            {
+                Console.WriteLine("Enter first value for Xor: ");
+                var firstValue = float.Parse(Console.ReadLine() ?? throw new InvalidOperationException());
+
+                Console.WriteLine("Enter second value for Xor: ");
+                var secondValue = float.Parse(Console.ReadLine() ?? throw new InvalidOperationException());
+
+                if (firstValue > 1 || firstValue < 0 || secondValue > 1 || secondValue < 0)
+                {
+                    Console.WriteLine("Bad input, exit.");
+                    break;
+                }
+
+                var inputs = new[] {firstValue, secondValue};
+
+                var response = net.FeedForward(inputs);
+                var absoluteResponse = response > 0.5 ? 1 : 0;
+                Console.WriteLine($"Response: {absoluteResponse}{Environment.NewLine}");
+            }
         }
 
-        static List<TrainingData<float[]>> GetXORTrainingData()
+        static List<TrainingData<float[]>> GetXorTrainingData()
         {
             var trainingDataFilePath = $"{Environment.CurrentDirectory}/Resources/XOR_training_data.txt";
 
@@ -64,7 +85,7 @@ namespace ConsoleNandGateSample
             return trainingDataSet;
         }
 
-        static List<TrainingData<float[]>> GetNANDTrainingData()
+        static List<TrainingData<float[]>> GetNandTrainingData()
         {
             var trainingDataFilePath = $"{Environment.CurrentDirectory}/Resources/NAND_training_data.txt";
 
@@ -92,12 +113,18 @@ namespace ConsoleNandGateSample
         }
 
         // Build network with 2 inputs and one output (simple Perceptron)
-        //O--
-        //   --
-        //      -- O
-        //   --
-        //O--
-        static Net BuildNet()
+        //   I     H       O
+
+        //   O----- O -
+        //    -  -      -
+        //      -         - O
+        //    -  -      -
+        //   O----- O  -
+        //      -     -
+        //   O -    O
+
+        //   B      B
+        static PerceptronNet BuildNet()
         {
             var layers = new List<NeuronLayer>();
 
@@ -139,7 +166,7 @@ namespace ConsoleNandGateSample
             layers.Add(hiddenLayer);
             layers.Add(outputLayer);
 
-            var network = new Net(layers);
+            var network = new PerceptronNet(layers);
             return network;
         }
     }
