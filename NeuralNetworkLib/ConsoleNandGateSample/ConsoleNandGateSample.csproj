@@ -10,6 +10,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Resources\NAND_training_data.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\training_data.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

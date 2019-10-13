@@ -7,7 +7,7 @@ namespace NeuralNetworkLib
     public class Net
     {
         private readonly List<NeuronLayer> _layers;
-        
+
         public float FeedForward(float[] inputs)
         {
             var firstLayer = _layers.First();
@@ -19,25 +19,27 @@ namespace NeuralNetworkLib
             for (var neuronIndex = 0; neuronIndex < firstLayer.Neurons.Count - 1; neuronIndex++)
                 firstLayer.Neurons[neuronIndex].Value = inputs[neuronIndex];
 
-            for (var layerIndex = _layers.Count - 1; layerIndex >= 0; layerIndex--)
+            //layer index initially 1, because we cannot feed forward the input layer.
+            for (var layerIndex = 1; layerIndex < _layers.Count; layerIndex++)
             {
                 var neurons = _layers[layerIndex].Neurons;
                 
                 for (var neuronIndex = 0; neuronIndex < neurons.Count; neuronIndex++)
                 {
                     var neuron = neurons[neuronIndex];
-                    var weightSynapses = neuron.InputSynapses.Take(neuron.InputSynapses.Count - 2);
-                    var biasSynapse = neuron.InputSynapses.Skip(neuron.InputSynapses.Count - 2).Single();
+                    var weightSynapses = neuron.InputSynapses.Take(neuron.InputSynapses.Count - 1);
+                    
+                    var biasSynapseWeight = (neuron.InputSynapses.Count == 0) ? 0 : neuron.InputSynapses.Skip(neuron.InputSynapses.Count - 1).Take(1).Single().Weight;
 
                     //multiply all except last because it is bias.
                     var sum = weightSynapses.Sum(s => s.StartNeuron.Value * s.Weight);
-                    neuron.Value = MathHelper.Sigmoid(sum + biasSynapse.Weight);
+                    neuron.Value = MathHelper.Sigmoid(sum + biasSynapseWeight);
                 }
             }
 
             var lastLayer = _layers.Last();
-            var result = lastLayer.Neurons.Single();
-            return result.Value;
+            var response = lastLayer.Neurons.Single();
+            return response.Value;
         }
 
         public void CalculateError(float target)
@@ -58,27 +60,18 @@ namespace NeuralNetworkLib
 
         public void BackPropagate(float target, float learningRate)
         {
-            var outputNeuron = _layers.Last().Neurons.Last();
+            var reversedLayers = ((IEnumerable<NeuronLayer>) _layers).Reverse().ToList();
 
-            var hiddenLayerNeurons = _layers[_layers.Count - 2].Neurons;
-
-            foreach (var hiddenNeuron in hiddenLayerNeurons)
+            //we have no need to calculate in the first layer of inputs, because it has no one input synapse
+            foreach (var layer in reversedLayers.Take(reversedLayers.Count - 1))
             {
-                foreach (var inputSynapse in hiddenNeuron.OutputSynapses)
+                foreach (var outputNeuron in layer.Neurons)
                 {
-                    var deltaWeight = hiddenNeuron.Error * MathHelper.Sigmoid(outputNeuron.Value) * (1 - MathHelper.Sigmoid(outputNeuron.Value)) * inputSynapse.StartNeuron.Value;
-                    inputSynapse.Weight += deltaWeight * learningRate;
-                }
-            }
-
-            var inputLayerNeurons = _layers[_layers.Count - 2].Neurons;
-
-            for (var neuronIndex = 0; neuronIndex < inputLayerNeurons.Count; neuronIndex++)
-            {
-                foreach (var inputSynapse in inputLayerNeurons[neuronIndex].OutputSynapses)
-                {
-                    var deltaWeight = hiddenLayerNeurons[neuronIndex].Error * MathHelper.Sigmoid(hiddenLayerNeurons[neuronIndex].Value) * (1 - MathHelper.Sigmoid(hiddenLayerNeurons[neuronIndex].Value)) * inputSynapse.StartNeuron.Value;
-                    inputSynapse.Weight += deltaWeight * learningRate;
+                    foreach (var inputSynapse in outputNeuron.InputSynapses)
+                    {
+                        var deltaWeight = learningRate * outputNeuron.Error * outputNeuron.Value * (1 - outputNeuron.Value) * inputSynapse.StartNeuron.Value;
+                        inputSynapse.Weight += deltaWeight;
+                    }
                 }
             }
         }
@@ -87,7 +80,7 @@ namespace NeuralNetworkLib
         {
             for (var layerIndex = 0; layerIndex + 1 < layers.Count; layerIndex++)
             {
-                layers[layerIndex].ConnectToOutputLayer(layers[layerIndex + 1]);
+                layers[layerIndex].ConnectToOutputLayerWithBiases(layers[layerIndex + 1]);
             }
 
             _layers = layers;
