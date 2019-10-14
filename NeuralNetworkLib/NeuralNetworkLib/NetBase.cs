@@ -78,10 +78,10 @@ namespace NeuralNetworkLib
             
             var neurons = outputLayer.Neurons;
             
-            if(targets.Length != neurons.Count)
+            if(targets.Length != neurons.Count - 1)
                 throw  new InvalidDataException("Targets length and count of output neurons is not equal.");
             
-            for (var neuronIndex = 0; neuronIndex < neurons.Count; neuronIndex++)
+            for (var neuronIndex = 0; neuronIndex < neurons.Count - 1; neuronIndex++)
             {
                 var neuron = neurons[neuronIndex];
                 var target = targets[neuronIndex];
@@ -113,9 +113,8 @@ namespace NeuralNetworkLib
         /// Oo - output value (from next layer)
         /// Oh - current output value (from current layer) 
         /// </summary>
-        /// <param name="target">Desired values</param>
         /// <param name="learningRate">Rate of adjusting of weight</param>
-        public void BackPropagate(float[] target, float learningRate)
+        public void BackPropagate(float learningRate)
         {
             //we need to go from right to left not vise versa
             var layers = GetReversedLayers(Layers);

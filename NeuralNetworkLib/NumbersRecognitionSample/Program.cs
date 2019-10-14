@@ -18,7 +18,7 @@ namespace NumbersRecognitionSample
         {
             var net = BuildNetwork();
 
-            for (var epochIndex = 0; epochIndex < 1; epochIndex++)
+            for (var epochIndex = 0; epochIndex < 4; epochIndex++)
             {
                 //Get training data from MNIST
                 var imagesTrainingData = GetTrainingData(_imagesPath, _labelsPath);
@@ -27,12 +27,12 @@ namespace NumbersRecognitionSample
                 {
                     net.FeedForward(trainingData.Data);
                     net.CalculateError(trainingData.Targets);
-                    net.BackPropagate(trainingData.Targets, _learningRate);
+                    net.BackPropagate(_learningRate);
 
                     var error = net.GetOutputLayer().Neurons.Select(n => n.Error).Sum();
                     var target = MathHelper.GetIndexOfMaxValue(trainingData.Targets) + 1;
                     var response = net.GetResult();
-
+                    
                     Console.WriteLine($"error: {error}");
                     Console.WriteLine($"target: {target}");
                     Console.WriteLine($"response: {response}");
@@ -47,7 +47,7 @@ namespace NumbersRecognitionSample
             var hiddenLayer = GenerateLayer(100);
             
             //because there is no need to put bias to output
-            var outputLayer = GenerateLayer(9);
+            var outputLayer = GenerateLayer(10);
 
             var layers = new List<NeuronLayer> { inputLayer, hiddenLayer, outputLayer };
             
