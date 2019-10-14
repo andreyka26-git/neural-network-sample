@@ -18,9 +18,10 @@ namespace NeuralNetworkLib
         /// <param name="layers">Layers</param>
         public NetBase(List<NeuronLayer> layers)
         {
-            for (var layerIndex = 0; layerIndex + 1 < layers.Count; layerIndex++)
+            for (var layerIndex = 0;  layerIndex + 1 < layers.Count;  layerIndex++)
             {
-                layers[layerIndex].ConnectToOutputLayerWithBiases(layers[layerIndex + 1]);
+                var max = 1.0f / layers[layerIndex].Neurons.Count;
+                layers[layerIndex].ConnectToOutputLayerWithBiases(layers[layerIndex + 1], 0.0001, max);
             }
 
             Layers = layers;
@@ -76,10 +77,10 @@ namespace NeuralNetworkLib
             var outputLayer = layers.First();
             
             var neurons = outputLayer.Neurons;
-
+            
             if(targets.Length != neurons.Count)
                 throw  new InvalidDataException("Targets length and count of output neurons is not equal.");
-
+            
             for (var neuronIndex = 0; neuronIndex < neurons.Count; neuronIndex++)
             {
                 var neuron = neurons[neuronIndex];
@@ -91,7 +92,7 @@ namespace NeuralNetworkLib
             //2. propagate error to hidden layers
 
             //get all layers without first and last
-            foreach (var layer in layers.Skip(1).Take(layers.Count - 1))
+            foreach (var layer in layers.Skip(1).Take(layers.Count - 2))
             {
                 foreach (var neuron in layer.Neurons)
                 {

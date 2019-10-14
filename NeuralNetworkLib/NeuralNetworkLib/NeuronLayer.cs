@@ -56,7 +56,9 @@ namespace NeuralNetworkLib
         /// It should not connect biases with previous layer
         /// </summary>
         /// <param name="outputNeuronLayer">Layer from the right side</param>
-        public void ConnectToOutputLayerWithBiases(NeuronLayer outputNeuronLayer)
+        /// <param name="max">Max value of weight</param>
+        /// <param name="min">Min value of weight</param>
+        public void ConnectToOutputLayerWithBiases(NeuronLayer outputNeuronLayer, double max, double min)
         {
             var random = new Random();
 
@@ -74,8 +76,10 @@ namespace NeuralNetworkLib
                 //connect all neurons with bias from current layer to right layer
                 foreach (var inputNeuron in Neurons)
                 {
+                    var value = random.NextDouble() * (max - min) + min;
+
                     inputNeuron.ConnectToOutputNeuron(
-                        outputNeuron, (float)random.NextDouble());
+                        outputNeuron, (float)value);
                 }
             }
         }

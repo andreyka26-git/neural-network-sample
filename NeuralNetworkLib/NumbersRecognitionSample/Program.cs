@@ -12,13 +12,13 @@ namespace NumbersRecognitionSample
         private static string _imagesPath = $"{Environment.CurrentDirectory}/Resources/train-images.idx3-ubyte";
         private static string _labelsPath = $"{Environment.CurrentDirectory}/Resources/train-labels.idx1-ubyte";
 
-        private static float _learningRate = 0.4f;
+        private static float _learningRate = 0.3f;
 
         static void Main()
         {
             var net = BuildNetwork();
 
-            for (var epochIndex = 0; epochIndex < 500; epochIndex++)
+            for (var epochIndex = 0; epochIndex < 1; epochIndex++)
             {
                 //Get training data from MNIST
                 var imagesTrainingData = GetTrainingData(_imagesPath, _labelsPath);
@@ -29,7 +29,14 @@ namespace NumbersRecognitionSample
                     net.CalculateError(trainingData.Targets);
                     net.BackPropagate(trainingData.Targets, _learningRate);
 
+                    var error = net.GetOutputLayer().Neurons.Select(n => n.Error).Sum();
+                    var target = MathHelper.GetIndexOfMaxValue(trainingData.Targets) + 1;
                     var response = net.GetResult();
+
+                    Console.WriteLine($"error: {error}");
+                    Console.WriteLine($"target: {target}");
+                    Console.WriteLine($"response: {response}");
+                    Console.WriteLine($"--------------------------{Environment.NewLine}");
                 }
             }
         }
@@ -38,7 +45,9 @@ namespace NumbersRecognitionSample
         {
             var inputLayer = GenerateLayer(28 * 28);
             var hiddenLayer = GenerateLayer(100);
-            var outputLayer = GenerateLayer(10);
+            
+            //because there is no need to put bias to output
+            var outputLayer = GenerateLayer(9);
 
             var layers = new List<NeuronLayer> { inputLayer, hiddenLayer, outputLayer };
             
@@ -139,7 +148,7 @@ namespace NumbersRecognitionSample
             }
 
             return targetArr;
-        }
+         }
 
         private static int ReadBigInt32(BinaryReader br)
         {
